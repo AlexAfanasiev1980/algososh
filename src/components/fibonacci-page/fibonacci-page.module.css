@@ -1,0 +1,25 @@
+.content {
+  width: 46%;
+  display: flex;
+  margin: 0 auto;
+}
+
+.string {
+  max-width: 944px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 48px auto 0 auto;
+}
+
+.item {
+  margin: 0 16px 48px 0;
+}
+
+.text {
+  margin: 8px 0 0 0;
+}
+
+.item1 {
+  margin: 0;
+}

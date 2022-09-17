@@ -1,0 +1,33 @@
+.stack {
+  display: flex;
+  justify-content: space-between;
+  max-width: 829px;
+  margin: 0 auto;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.string {
+  display: flex;
+  justify-content: center;
+  list-style-type: none;
+}
+
+.item_stack {
+  margin: 0 16px 48px 0;
+}
+
+.text {
+  margin: 8px 0 0 0;
+}
+
+.text_top {
+  height: 22px;
+}
+
+.item_stack1 {
+  margin: 0;
+}

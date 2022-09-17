@@ -1,0 +1,11 @@
+.content {
+  width: 46%;
+  display: flex;
+  margin: 0 auto;
+}
+
+.string {
+  display: flex;
+  justify-content: center;
+  margin: 120px auto 0 auto;
+}
