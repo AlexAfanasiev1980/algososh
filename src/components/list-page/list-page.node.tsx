@@ -1,5 +1,3 @@
-import { createSecureContext } from "tls";
-
 export class Nodes<T> {
   value: T | null;
   next: Nodes<T> | null;
@@ -51,26 +49,25 @@ export class LinkedList<T> implements ILinkedList<T> {
     if (index < 0 || index > this.size) {
       console.log("Enter a valid index");
       return;
-    } else {
-      const node = new Nodes(element);
-      if (index === 0) {
-        node.next = this.head;
-        this.head = node;
-      } else {
-        let curr = this.head;
-        let currIndex = 0;
-        while (currIndex < index) {
-          if (currIndex === index - 1) {
-            node.next = curr!.next;
-            curr!.next = node;
-          } else {
-            curr = curr!.next;
-          }
-          currIndex++;
-        }
-      }
-      this.size++;
     }
+    const node = new Nodes(element);
+    if (index === 0) {
+      node.next = this.head;
+      this.head = node;
+    } else {
+      let curr = this.head;
+      let currIndex = 0;
+      while (currIndex < index) {
+        if (currIndex === index - 1) {
+          node.next = curr!.next;
+          curr!.next = node;
+        } else {
+          curr = curr!.next;
+        }
+        currIndex++;
+      }
+    }
+    this.size++;
   }
 
   append(element: T) {
@@ -179,18 +176,15 @@ export class LinkedList<T> implements ILinkedList<T> {
           if (nextNode) {
             current.next = nextNode.next;
           }
-          
         } else {
           if (current.next) {
             current = current.next;
           }
-          
         }
         count++;
       }
       this.size--;
     }
-    
   }
 
   getHead(): Nodes<T> | null {
@@ -209,7 +203,7 @@ export class LinkedList<T> implements ILinkedList<T> {
   }
 
   getIndex(index: number) {
-    if (this.head === null || index > this.size -1) {
+    if (this.head === null || index > this.size - 1) {
       return;
     }
     let current = this.head;
@@ -218,7 +212,7 @@ export class LinkedList<T> implements ILinkedList<T> {
       if (current.next) {
         current = current.next;
       }
-      
+
       count++;
     }
     return current;

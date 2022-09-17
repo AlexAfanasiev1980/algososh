@@ -4,6 +4,9 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./fibonacci-page.module.css";
+import { v4 as uuidv4 } from "uuid";
+import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../constants/delays";
+import { getArr, getFibonacciNumbers  } from "./utils";
 
 export const FibonacciPage: React.FC = () => {
   const [fibonacci, setFibonacci] = useState<Array<number> | null>([]);
@@ -11,13 +14,8 @@ export const FibonacciPage: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
   const [isDisabled, setDisabled] = useState<boolean>(false);
-
-  const getArr = (arr: number[], count: number): number[] | null => {
-    if (arr.length <= 0) {
-      return null;
-    }
-    return arr.filter((el, index) => index < count && index !== 0);
-  };
+  const maxString = 9;
+  const maxLength = 19;
 
   const countID = (arr: number[], steps: number, count: number) => {
     setLoader(true);
@@ -27,38 +25,25 @@ export const FibonacciPage: React.FC = () => {
       setArrFib([]);
       setLoader(false);
       return;
-    } else {
-      setTimeout(countID, 1000, arr, steps, count);
-    }
-  };
-
-  const fibIterative = (n: number): number[] => {
-    let arr: number[] = [0, 1];
-    for (let i = 2; i < n + 2; i++) {
-      arr.push(arr[i - 2] + arr[i - 1]);
-    }
-    return arr;
+    } 
+    setTimeout(countID, DELAY_IN_MS, arr, steps, count);
   };
 
   const handleButton = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const arr: number[] = [];
-    if (Number(inputValue) > 0) {
-      arr.push(...fibIterative(Number(inputValue)));
-    }
-    setArrFib(arr);
+    setArrFib(getFibonacciNumbers(Number(inputValue)));
     setInputValue("");
     setLoader(false);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    Number(e.target.value) > 19 ? setDisabled(true) : setDisabled(false);
+    Number(e.target.value) > maxLength ? setDisabled(true) : setDisabled(false);
     setInputValue(e.target.value);
   };
 
   useEffect(() => {
     if (arrFib.length > 0) {
-      setTimeout(countID, 500, arrFib, arrFib.length, 1);
+      setTimeout(countID, SHORT_DELAY_IN_MS, arrFib, arrFib.length, 1);
     }
   }, [arrFib]);
 
@@ -85,12 +70,9 @@ export const FibonacciPage: React.FC = () => {
       {fibonacci && (
         <div className={styles.string}>
           {fibonacci.map((el, index, arr) => {
-            let classText = "item";
-            if (index === arr.length - 1 || index === 9) {
-              classText = "item1";
-            }
+            const classText =  index === arr.length - 1 || index === maxString ? "item1" : "item"
             return (
-              <div className={styles[classText]}>
+              <div className={styles[classText]} key={uuidv4()}>
                 <Circle letter={String(el)} key={index} />
                 <p className={styles.text}>{index}</p>
               </div>

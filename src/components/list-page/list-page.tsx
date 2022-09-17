@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import styles from "./list-page.module.css";
 import { ILinkedList } from "./list-page.node";
 import { ElementStates } from "../../types/element-states";
+import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../constants/delays";
 
 let list: ILinkedList<number> = new LinkedList<number>();
 
@@ -18,19 +19,9 @@ interface IData {
   type: "head" | "tail" | "delHead" | "delTail" | "AddIndex" | "DelIndex" | "";
 }
 
-// interface IButton {
-//   addHead?: boolean | undefined
-//   addTail?: boolean | undefined
-//   delHead?: boolean | undefined
-//   delTail?: boolean | undefined
-//   addByIndex?: boolean | undefined
-//   delByIndex?: boolean | undefined
-// }
-
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputIndexValue, setInputIndexValue] = useState<string>("");
-  // const [loader, setLoader] = useState<IButton | undefined>();
   const [listArr, setListArr] = useState<number[] | undefined>([]);
   const [data, setData] = useState<IData>({
     number: undefined,
@@ -51,26 +42,22 @@ export const ListPage: React.FC = () => {
   const [loaderDelByIndex, setLoaderDelByIndex] = useState<boolean>(false);
   const [loaderDelHead, setLoaderDelHead] = useState<boolean>(false);
   const [loaderDelTail, setLoaderDelTail] = useState<boolean>(false);
-  // const [addTail, setAddTail] = useState<boolean>(true);
 
   const randomListArray = () => {
     const random = Math.floor(Math.random() * (6 - 4) + 4);
     const arr = [];
     for (let i = 0; i < random; i++) {
-      arr.push(Math.floor(Math.random() * 100));
-    }
-    for (let i = 0; i < arr.length; i++) {
-      list.append(arr[i]);
+      let value = Math.floor(Math.random() * 100);
+      arr.push(value);
+      list.append(value);
     }
     const setList: number[] | undefined = [];
     let current = list.getHead();
-    if (current !== null) {
-      if (current.value !== null) {
+    if (current !== null && current.value !== null) {
         while (current?.value) {
           setList.push(current.value);
           current = current?.next;
         }
-      }
     }
     setListArr(setList);
   };
@@ -115,10 +102,10 @@ export const ListPage: React.FC = () => {
           setLoaderAddByIndex(false);
           setTimeout(() => {
             setNumberColor(undefined);
-          }, 500);
-        }, 500);
+          }, SHORT_DELAY_IN_MS);
+        }, SHORT_DELAY_IN_MS);
       }
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
   };
 
   const delByIndex = (e: React.SyntheticEvent) => {
@@ -163,10 +150,10 @@ export const ListPage: React.FC = () => {
           setInputValue("");
           setTimeout(() => {
             setNumberColor(undefined);
-          }, 500);
-        }, 500);
+          }, SHORT_DELAY_IN_MS);
+        }, SHORT_DELAY_IN_MS);
       }
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
   };
 
   const addArrAppend = (e: React.SyntheticEvent) => {
@@ -192,8 +179,8 @@ export const ListPage: React.FC = () => {
       setLoaderAddTail(false);
       setTimeout(() => {
         setNumberColor(undefined);
-      }, 500);
-    }, 500);
+      }, SHORT_DELAY_IN_MS);
+    }, SHORT_DELAY_IN_MS);
   };
 
   const addArrPrepend = (e: React.SyntheticEvent) => {
@@ -219,8 +206,8 @@ export const ListPage: React.FC = () => {
       setLoaderAddHead(false);
       setTimeout(() => {
         setNumberColor(undefined);
-      }, 1000);
-    }, 1000);
+      }, DELAY_IN_MS);
+    }, DELAY_IN_MS);
   };
 
   const deleteArrPrepend = (e: React.SyntheticEvent) => {
@@ -242,7 +229,7 @@ export const ListPage: React.FC = () => {
       setListArr(list.getElements());
       setData({ type: "" });
       setLoaderDelHead(false);
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
   };
 
   const deleteArrAppend = (e: React.SyntheticEvent) => {
@@ -264,15 +251,15 @@ export const ListPage: React.FC = () => {
       setListArr(list.getElements());
       setData({ type: "" });
       setLoaderDelTail(false);
-    }, 500);
+    }, SHORT_DELAY_IN_MS);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.placeholder === "Введите значение") {
-      setInputValue(e.target.value);
+      setInputValue(e.target.value.trim());
     } else {
-      setInputIndexValue(e.target.value);
+      setInputIndexValue(e.target.value.trim());
     }
   };
 

@@ -5,16 +5,21 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./stack-page.module.css";
 import { ElementStates } from "../../types/element-states";
+import { Stack } from "./stack-page.node";
+import { IStack } from "./stack-page.node";
 import { v4 as uuidv4 } from "uuid";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
-interface IStack {
-  element: string;
-  color: number;
+let classStack: IStack<string> = new Stack<string>();
+
+interface INewStack {
+  element: string | null;
+  color?: number;
 }
 
 export const StackPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
-  const [stack, setStack] = useState<Array<IStack>>([]);
+  const [stack, setStack] = useState<Array<INewStack>>([]);
   const [buttonAdd, setButtonAdd] = useState<boolean>(true);
   const [buttonDelete, setButtonDelete] = useState<boolean>(true);
 
@@ -29,9 +34,10 @@ export const StackPage: React.FC = () => {
 
   const addStack = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setStack([...stack, { element: inputValue, color: 2 }]);
-    const stackNew = [...stack, { element: inputValue, color: 1 }];
-    setTimeout(setStack, 500, stackNew);
+    classStack.push(inputValue);
+    setStack([...stack, { element: classStack.peak(), color: 2 }]);
+    const stackNew = [...stack, { element: classStack.peak(), color: 1 }];
+    setTimeout(setStack, SHORT_DELAY_IN_MS, stackNew);
     setInputValue("");
     setButtonAdd(true);
   };
@@ -39,17 +45,20 @@ export const StackPage: React.FC = () => {
   const deleteStack = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (stack.length > 0) {
-      const newStack: IStack | undefined = stack.slice(-1)[0];
+      const newStack: INewStack | undefined = {
+        element: classStack.peak(),
+        color: 2,
+      };
       if (newStack) {
-        newStack.color = 2;
         setStack([...stack.slice(0, -1), newStack]);
-        setTimeout(setStack, 500, stack.slice(0, -1));
+        setTimeout(setStack, SHORT_DELAY_IN_MS, stack.slice(0, -1));
       }
     }
   };
 
   const clearStack = (e: React.SyntheticEvent) => {
     e.preventDefault();
+    classStack.clear();
     setStack([]);
   };
 
@@ -78,13 +87,17 @@ export const StackPage: React.FC = () => {
             extraClass="mr-6"
             disabled={buttonAdd}
           />
-          <Button text="Удалить" onClick={deleteStack} disabled={buttonDelete}/>
+          <Button
+            text="Удалить"
+            onClick={deleteStack}
+            disabled={buttonDelete}
+          />
         </div>
-        <Button text="Очистить" onClick={clearStack} disabled={buttonDelete}/>
+        <Button text="Очистить" onClick={clearStack} disabled={buttonDelete} />
       </div>
       {stack && (
         <ul className={styles.string}>
-          {stack.map((el: IStack, index: number, arr: IStack[]) => {
+          {stack.map((el: INewStack, index: number, arr: INewStack[]) => {
             let color: ElementStates = ElementStates.Default;
             if (el.color === 2) {
               color = ElementStates.Changing;

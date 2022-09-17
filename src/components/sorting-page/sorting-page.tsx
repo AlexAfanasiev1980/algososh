@@ -7,43 +7,27 @@ import styles from "./sorting-page.module.css";
 import { Direction } from "../../types/direction";
 import { ElementStates } from "../../types/element-states";
 import { v4 as uuidv4 } from "uuid";
-
-interface IElements {
-  arr: Array<number[]>;
-  comparable: Array<number[]>;
-  notsorted: Array<number[]>;
-  sorted: Array<number[]>;
-}
-
-interface IElement {
-  arr: number[];
-  comparable: number[];
-  notsorted: number[];
-  sorted: number[];
-}
+import { IElements, IElement } from "./types";
+import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { swap } from "./utils";
 
 export const SortingPage: React.FC = () => {
+  const defaultState = {
+    arr: [],
+    comparable: [],
+    notsorted: [],
+    sorted: [],
+  }
   const [loaderUp, setLoaderUp] = useState<boolean>(false);
   const [loaderDown, setLoaderDown] = useState<boolean>(false);
   const [getCheckedsetChoice, setCheckedChoice] = useState<boolean>(true);
   const [getCheckedVial, setCheckedVial] = useState<boolean>(false);
   const [array, setArray] = useState<number[]>([]);
-  const [arrayElements, setArrayElements] = useState<Array<number[]>>([]);
   const [upButton, setUpButton] = useState<boolean>(false);
   const [downButton, setDownButton] = useState<boolean>(false);
   const [arrButton, setArrButton] = useState<boolean>(false);
-  const [elements, setElements] = useState<IElements>({
-    arr: [],
-    comparable: [],
-    notsorted: [],
-    sorted: [],
-  });
-  const [element, setElement] = useState<IElement>({
-    arr: [],
-    comparable: [],
-    notsorted: [],
-    sorted: [],
-  });
+  const [elements, setElements] = useState<IElements>(defaultState);
+  const [element, setElement] = useState<IElement>(defaultState);
 
   const [arrayNew, setArrayNew] = useState<number[]>([]);
   let [step, setStep] = useState<number>(0);
@@ -69,17 +53,6 @@ export const SortingPage: React.FC = () => {
       sorted: [[]],
     });
     setStep(0);
-  };
-
-  const swap = (
-    arr: number[],
-    firstIndex: number,
-    secondIndex: number
-  ): number[] => {
-    const temp = arr[firstIndex];
-    arr[firstIndex] = arr[secondIndex];
-    arr[secondIndex] = temp;
-    return arr;
   };
 
   const selectionSort = (choice: number) => {
@@ -364,15 +337,15 @@ export const SortingPage: React.FC = () => {
       setLoaderDown(false);
       return;
     } else {
-      setTimeout(count1, 500, steps, count);
+      setTimeout(count1, SHORT_DELAY_IN_MS, steps, count);
     }
   };
 
   useEffect(() => {
     if (elements.arr.length > 0) {
-      setTimeout(count1, 500, elements.arr.length, 0);
+      setTimeout(count1, SHORT_DELAY_IN_MS, elements.arr.length, 0);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elements]);
 
   return (
