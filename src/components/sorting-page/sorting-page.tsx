@@ -6,7 +6,6 @@ import { Column } from "../ui/column/column";
 import styles from "./sorting-page.module.css";
 import { Direction } from "../../types/direction";
 import { ElementStates } from "../../types/element-states";
-import { v4 as uuidv4 } from "uuid";
 import { IElements, IElement } from "./types";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { swap } from "./utils";
@@ -413,7 +412,7 @@ export const SortingPage: React.FC = () => {
                   index={el}
                   extraClass="ml-2"
                   state={color}
-                  key={uuidv4()}
+                  key={`${el.toString()}${index.toString()}`}
                 />
               );
             })}

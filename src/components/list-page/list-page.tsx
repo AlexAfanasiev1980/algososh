@@ -5,7 +5,6 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { LinkedList } from "./list-page.node";
 import { ArrowIcon } from "../ui/icons/arrow-icon";
-import { v4 as uuidv4 } from "uuid";
 import styles from "./list-page.module.css";
 import { ILinkedList } from "./list-page.node";
 import { ElementStates } from "../../types/element-states";
@@ -423,7 +422,7 @@ export const ListPage: React.FC = () => {
             }
 
             return (
-              <li key={index} className={styles.item_li}>
+              <li key={`${el.toString()}${index.toString()}`} className={styles.item_li}>
                 <div>
                   {typeHead === 1 && (
                     <div className={styles.text_top}>

@@ -5,7 +5,6 @@ import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./queue-page.module.css";
 import { ElementStates } from "../../types/element-states";
-import { v4 as uuidv4 } from "uuid";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { Queue } from "./queue-page.node";
 import { IQueue } from "./queue-page.node";
@@ -143,7 +142,7 @@ export const QueuePage: React.FC = () => {
                 ? "item_stack1"
                 : "item_stack";
             return (
-              <li className={styles[classText]} key={uuidv4()}>
+              <li className={styles[classText]} key={`${el}${index.toString()}`}>
                 {index === head && <p className={styles.text_top}>head</p>}
                 {index !== head && <p className={styles.text_top}> </p>}
                 <Circle letter={el} state={color} />
