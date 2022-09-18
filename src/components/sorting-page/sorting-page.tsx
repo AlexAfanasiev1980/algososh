@@ -345,7 +345,6 @@ export const SortingPage: React.FC = () => {
     if (elements.arr.length > 0) {
       setTimeout(count1, SHORT_DELAY_IN_MS, elements.arr.length, 0);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [elements]);
 
   return (
@@ -358,14 +357,14 @@ export const SortingPage: React.FC = () => {
               name="choice"
               value="choice"
               checked={getCheckedsetChoice}
-              onClick={handleInput}
+              onChange={handleInput}
             />
             <RadioInput
               label="Пузырек"
               name="vial"
               value="vial"
               checked={getCheckedVial}
-              onClick={handleInput}
+              onChange={handleInput}
             />
           </div>
           <div className={`${styles.flex} ${styles.button}`}>

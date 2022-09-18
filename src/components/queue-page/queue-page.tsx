@@ -7,16 +7,16 @@ import styles from "./queue-page.module.css";
 import { ElementStates } from "../../types/element-states";
 import { v4 as uuidv4 } from "uuid";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { Queue } from "./queue-page.node";
+import { IQueue } from "./queue-page.node";
+import { IColor } from "./types";
 
-interface IColor {
-  color?: ElementStates;
-  index?: number | undefined;
-}
+const defaultContainer = [...["", "", "", "", "", "", ""]];
+const turn: IQueue<string> = new Queue<string>(7, defaultContainer);
 
 export const QueuePage: React.FC = () => {
-  const defaultContainer = ["", "", "", "", "", "", ""];
   const [inputValue, setInputValue] = useState<string>("");
-  const [container, setContainer] = useState<string[]>(defaultContainer);
+  const [container, setContainer] = useState<string[]>([]);
   const [head, setHead] = useState<number>(0);
   const [tail, setTail] = useState<number>(0);
   const [tailColor, setTailColor] = useState<IColor>({});
@@ -25,7 +25,8 @@ export const QueuePage: React.FC = () => {
   const [buttonAdd, setButtonAdd] = useState<boolean>(true);
   const [buttonDelete, setButtonDelete] = useState<boolean>(true);
   const [buttonClear, setButtonClear] = useState<boolean>(true);
-  const maxLength = 6;
+  const maxIndex = 6;
+  const maxLength = 7;
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
@@ -34,65 +35,65 @@ export const QueuePage: React.FC = () => {
 
   const enqueue = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (length === 7 || tail === 7 || head === 6) {
+    if (
+      turn.getLength() === maxLength ||
+      turn.getTail() === maxLength ||
+      turn.getHead() === maxIndex
+    ) {
       return;
     }
-    setTailColor({ color: ElementStates.Changing, index: tail });
+    setTailColor({ color: ElementStates.Changing, index: turn.getTail() });
     setTimeout(() => {
-      const arr = container;
-      if (tail === 0 && head !== 0) {
-        arr[head] = inputValue;
-        setTail(head + 1);
+      if (turn.getTail() === 0 && turn.getHead() !== 0) {
+        setTail(turn.getHead() + 1);
       } else {
-        arr[tail] = inputValue;
-        setTail(tail + 1);
+        setTail(turn.getTail() + 1);
       }
-      setContainer([...arr]);
+      turn.enqueue(inputValue);
+      setLength(turn.getLength());
+      setContainer(turn.getElements());
       setInputValue("");
       setButtonAdd(true);
     }, SHORT_DELAY_IN_MS);
     setTimeout(() => {
       setTailColor({});
     }, SHORT_DELAY_IN_MS);
-    setLength(length + 1);
   };
 
   const dequeue = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (head === 7) {
+    if (turn.getHead() === maxLength || turn.getHead() === turn.getTail()) {
       return;
     }
-    const arr = container;
-
-    setHeadColor({ color: ElementStates.Changing, index: head });
+    setHeadColor({ color: ElementStates.Changing, index: turn.getHead() });
     setTimeout(() => {
-      arr[head] = "";
-      setContainer([...arr]);
-      if (head === 6 || head + 2 > tail) {
+      turn.dequeue("");
+      setContainer(turn.getElements());
+      if (turn.getHead() === maxIndex || turn.getHead() + 1 > turn.getTail()) {
         setTail(0);
       }
-      if (head < 6) {
-        setHead(head + 1);
+      if (turn.getHead() < maxLength) {
+        setHead(turn.getHead());
       }
       setHeadColor({});
     }, SHORT_DELAY_IN_MS);
-
-    setLength(length - 1);
+    setLength(turn.getLength());
   };
 
-  const clear = () => {
-    setHead(0);
-    setTail(0);
-    setContainer(defaultContainer);
-    setLength(0);
+  const clear = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    const defaultEl = ["", "", "", "", "", "", ""];
+    turn.clear(defaultEl);
+    setTimeout(() => {
+      setHead(turn.getHead());
+      setTail(turn.getTail());
+      setLength(turn.getLength());
+      setContainer(turn.getElements());
+    }, 500);
   };
 
   useEffect(() => {
-    if (length) {
-      setButtonDelete(false);
-    } else {
-      setButtonDelete(true);
-    }
+    length ? setButtonDelete(false) : setButtonDelete(true);
     if (length) {
       setButtonClear(false);
     } else if (length === 0 && head === 6) {
@@ -101,6 +102,10 @@ export const QueuePage: React.FC = () => {
       setButtonClear(true);
     }
   }, [length, head]);
+
+  useEffect(() => {
+    setContainer(defaultContainer);
+  }, [])
 
   return (
     <SolutionLayout title="Очередь">
@@ -133,7 +138,10 @@ export const QueuePage: React.FC = () => {
             if (headColor.color && index === headColor.index) {
               color = headColor?.color;
             }
-            const classText = index === arr.length - 1 || index === maxLength ? "item_stack1" : "item_stack";
+            const classText =
+              index === arr.length - 1 || index === maxIndex
+                ? "item_stack1"
+                : "item_stack";
             return (
               <li className={styles[classText]} key={uuidv4()}>
                 {index === head && <p className={styles.text_top}>head</p>}

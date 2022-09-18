@@ -89,9 +89,9 @@ export const StringComponent: React.FC = () => {
                   color = ElementStates.Default;
                 }
               }
-              return <Circle state={color} letter={el} />;
+              return <Circle state={color} letter={el} key={index}/>;
             } else {
-              return <Circle letter={el} />;
+              return <Circle letter={el} key={index}/>;
             }
           })}
         </div>

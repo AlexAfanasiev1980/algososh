@@ -10,14 +10,9 @@ import styles from "./list-page.module.css";
 import { ILinkedList } from "./list-page.node";
 import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../constants/delays";
+import { IData } from "./types";
 
 let list: ILinkedList<number> = new LinkedList<number>();
-
-interface IData {
-  number?: number | undefined | null;
-  index?: number | undefined;
-  type: "head" | "tail" | "delHead" | "delTail" | "AddIndex" | "DelIndex" | "";
-}
 
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -54,10 +49,10 @@ export const ListPage: React.FC = () => {
     const setList: number[] | undefined = [];
     let current = list.getHead();
     if (current !== null && current.value !== null) {
-        while (current?.value) {
-          setList.push(current.value);
-          current = current?.next;
-        }
+      while (current?.value) {
+        setList.push(current.value);
+        current = current?.next;
+      }
     }
     setListArr(setList);
   };
@@ -110,13 +105,13 @@ export const ListPage: React.FC = () => {
 
   const delByIndex = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!inputIndexValue) {
+    if (!inputIndexValue || Number(inputIndexValue) > list.getSize() - 1) {
       return;
     }
     let count = 0;
     let element = Number(inputIndexValue);
     let nodeValue: number | undefined | null = list?.getIndex(element)?.value;
-    setTarget(element);
+    // setTarget(element);
     setData({
       ...data,
       number: nodeValue,
@@ -130,7 +125,7 @@ export const ListPage: React.FC = () => {
     setDelHead(true);
     setDelTail(true);
     setTimeout(function get() {
-      if (count < element) {
+      if (count <= element) {
         count++;
         setData({
           ...data,
@@ -138,11 +133,24 @@ export const ListPage: React.FC = () => {
           index: count,
           type: "DelIndex",
         });
-        setTimeout(get, 500);
+        setTimeout(get, DELAY_IN_MS);
+      } else if (count === element + 1) {
+        setTimeout(() => {
+          setData({
+            ...data,
+            number: nodeValue,
+            index: count - 1,
+            type: "DelIndex",
+          });
+          setTarget(element);
+          count++;
+        }, SHORT_DELAY_IN_MS);
+        setTimeout(get, SHORT_DELAY_IN_MS);
       } else {
         setTimeout(() => {
           list.deleteByIndex(element);
           setListArr(list.getElements());
+          setTarget(undefined);
           setInputIndexValue("");
           setInputValue("");
           setLoaderDelByIndex(false);
@@ -150,10 +158,10 @@ export const ListPage: React.FC = () => {
           setInputValue("");
           setTimeout(() => {
             setNumberColor(undefined);
-          }, SHORT_DELAY_IN_MS);
-        }, SHORT_DELAY_IN_MS);
+          }, DELAY_IN_MS);
+        }, DELAY_IN_MS);
       }
-    }, SHORT_DELAY_IN_MS);
+    }, DELAY_IN_MS);
   };
 
   const addArrAppend = (e: React.SyntheticEvent) => {
@@ -276,17 +284,9 @@ export const ListPage: React.FC = () => {
       setAddTail(true);
     }
 
-    if (inputIndexValue !== "" && inputValue !== "") {
-      setAddByIndex(false);
-    } else {
-      setAddByIndex(true);
-    }
+    inputIndexValue !== "" && inputValue !== "" ? setAddByIndex(false) : setAddByIndex(true);
+    inputIndexValue !== "" && listArr ? setDelByIndex(false) : setDelByIndex(true);
 
-    if (inputIndexValue !== "" && listArr) {
-      setDelByIndex(false);
-    } else {
-      setDelByIndex(true);
-    }
     if (listArr) {
       setDelHead(false);
       setDelTail(false);
@@ -377,9 +377,9 @@ export const ListPage: React.FC = () => {
         <ul className={styles.string}>
           {listArr.map((el: number, index: number, arr: number[]) => {
             let element = el.toString();
+            let condition = data.number && index === data.index;
             if (
-              data.number &&
-              index === data.index &&
+              condition &&
               (data.type === "delHead" ||
                 data.type === "delTail" ||
                 (data.type === "DelIndex" && index === targetIndex))
@@ -390,12 +390,10 @@ export const ListPage: React.FC = () => {
             let typeTail: number = 3;
             let color = ElementStates.Default;
             if (
-              data.number &&
-              index === data.index &&
+              condition &&
               (data.type === "head" ||
                 data.type === "delHead" ||
-                data.type === "AddIndex" ||
-                (data.type === "DelIndex" && index === targetIndex))
+                data.type === "AddIndex")
             ) {
               typeHead = 1;
             } else if (index === 0) {
@@ -404,9 +402,9 @@ export const ListPage: React.FC = () => {
               typeHead = 3;
             }
             if (
-              data.number &&
-              index === data.index &&
-              data.type === "delTail"
+              condition &&
+              (data.type === "delTail" ||
+                (data.type === "DelIndex" && index === targetIndex))
             ) {
               typeTail = 1;
             } else if (index === arr.length - 1) {
@@ -425,30 +423,31 @@ export const ListPage: React.FC = () => {
             }
 
             return (
-              <li key={uuidv4()} className={styles.item_li}>
+              <li key={index} className={styles.item_li}>
                 <div>
                   {typeHead === 1 && (
-                    <p className={styles.text_top}>
+                    <div className={styles.text_top}>
                       <Circle
                         letter={data?.number?.toString()}
                         state={ElementStates.Changing}
                         isSmall={true}
                       />
-                    </p>
+                    </div>
                   )}
                   {typeHead === 2 && <p className={styles.text_top}>head</p>}
                   {typeHead === 3 && <p className={styles.text_top}></p>}
                   <Circle letter={element} state={color} />
                   <p className={styles.text}>{index}</p>
-                  {typeTail === 1 && data.type === "delTail" && (
-                    <p className={styles.text_button}>
-                      <Circle
-                        letter={data?.number?.toString()}
-                        state={ElementStates.Changing}
-                        isSmall={true}
-                      />
-                    </p>
-                  )}
+                  {typeTail === 1 &&
+                    (data.type === "delTail" || data.type === "DelIndex") && (
+                      <div className={styles.text_button}>
+                        <Circle
+                          letter={data?.number?.toString()}
+                          state={ElementStates.Changing}
+                          isSmall={true}
+                        />
+                      </div>
+                    )}
                   {typeTail === 2 && <p className={styles.text_button}>tail</p>}
                   {typeTail === 3 && <p className={styles.text_button}> </p>}
                 </div>
