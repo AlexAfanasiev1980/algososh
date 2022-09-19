@@ -8,10 +8,13 @@ import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { Queue } from "./queue-page.node";
 import { IQueue } from "./queue-page.node";
-import { IColor } from "./types";
+import { IButtonState, IColor } from "./types";
+import { defaultButtonState } from "./utils";
 
 const defaultContainer = [...["", "", "", "", "", "", ""]];
 const turn: IQueue<string> = new Queue<string>(7, defaultContainer);
+const maxIndex = 6;
+const maxLength = 7;
 
 export const QueuePage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
@@ -21,15 +24,16 @@ export const QueuePage: React.FC = () => {
   const [tailColor, setTailColor] = useState<IColor>({});
   const [headColor, setHeadColor] = useState<IColor>({});
   const [length, setLength] = useState<number>(0);
-  const [buttonAdd, setButtonAdd] = useState<boolean>(true);
-  const [buttonDelete, setButtonDelete] = useState<boolean>(true);
-  const [buttonClear, setButtonClear] = useState<boolean>(true);
-  const maxIndex = 6;
-  const maxLength = 7;
+  const [buttonState, setButtonState] = useState<IButtonState>(defaultButtonState);
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
-    e.target.value ? setButtonAdd(false) : setButtonAdd(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        add: e.target.value === ""
+      }
+    });
   };
 
   const enqueue = (e: React.SyntheticEvent) => {
@@ -52,7 +56,6 @@ export const QueuePage: React.FC = () => {
       setLength(turn.getLength());
       setContainer(turn.getElements());
       setInputValue("");
-      setButtonAdd(true);
     }, SHORT_DELAY_IN_MS);
     setTimeout(() => {
       setTailColor({});
@@ -75,8 +78,9 @@ export const QueuePage: React.FC = () => {
         setHead(turn.getHead());
       }
       setHeadColor({});
+      setLength(turn.getLength());
     }, SHORT_DELAY_IN_MS);
-    setLength(turn.getLength());
+    
   };
 
   const clear = (e: React.SyntheticEvent) => {
@@ -92,15 +96,15 @@ export const QueuePage: React.FC = () => {
   };
 
   useEffect(() => {
-    length ? setButtonDelete(false) : setButtonDelete(true);
-    if (length) {
-      setButtonClear(false);
-    } else if (length === 0 && head === 6) {
-      setButtonDelete(false);
-    } else {
-      setButtonClear(true);
-    }
-  }, [length, head]);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        add: inputValue === "",
+        delete:  (length === 0 || head === maxIndex),
+        clear: length === 0
+      }
+    });
+  }, [inputValue, length, head]);
 
   useEffect(() => {
     setContainer(defaultContainer);
@@ -121,11 +125,11 @@ export const QueuePage: React.FC = () => {
             text="Добавить"
             onClick={enqueue}
             extraClass="mr-6"
-            disabled={buttonAdd}
+            disabled={buttonState.add}
           />
-          <Button text="Удалить" onClick={dequeue} disabled={buttonDelete} />
+          <Button text="Удалить" onClick={dequeue} disabled={buttonState.delete} />
         </div>
-        <Button text="Очистить" onClick={clear} disabled={buttonClear} />
+        <Button text="Очистить" onClick={clear} disabled={buttonState.clear} />
       </div>
       {container && (
         <ul className={styles.string}>

@@ -20,6 +20,7 @@ export interface ILinkedList<T> {
   getHead: () => Nodes<T> | null;
   getTail: () => Nodes<T> | undefined;
   getIndex: (index: number) => Nodes<T> | undefined;
+  clear: () => void;
 }
 
 export class LinkedList<T> implements ILinkedList<T> {
@@ -131,7 +132,7 @@ export class LinkedList<T> implements ILinkedList<T> {
   }
 
   addByIndex(element: T, index: number) {
-    if (index > this.size) {
+    if (index > this.size-1) {
       alert(`Введите индекс от 1 до ${this.size}`);
       return;
     }
@@ -216,5 +217,10 @@ export class LinkedList<T> implements ILinkedList<T> {
       count++;
     }
     return current;
+  }
+
+  clear() {
+    this.head = null;
+    this.size = 0;
   }
 }

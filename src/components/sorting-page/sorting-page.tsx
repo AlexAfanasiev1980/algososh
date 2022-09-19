@@ -6,28 +6,18 @@ import { Column } from "../ui/column/column";
 import styles from "./sorting-page.module.css";
 import { Direction } from "../../types/direction";
 import { ElementStates } from "../../types/element-states";
-import { IElements, IElement } from "./types";
+import { IElements, IElement, IButtonState } from "./types";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
-import { swap } from "./utils";
+import { swap, defaultState, defaultButtonState } from "./utils";
 
 export const SortingPage: React.FC = () => {
-  const defaultState = {
-    arr: [],
-    comparable: [],
-    notsorted: [],
-    sorted: [],
-  }
-  const [loaderUp, setLoaderUp] = useState<boolean>(false);
-  const [loaderDown, setLoaderDown] = useState<boolean>(false);
+  const [buttonState, setButtonState] =
+    useState<IButtonState>(defaultButtonState);
   const [getCheckedsetChoice, setCheckedChoice] = useState<boolean>(true);
   const [getCheckedVial, setCheckedVial] = useState<boolean>(false);
   const [array, setArray] = useState<number[]>([]);
-  const [upButton, setUpButton] = useState<boolean>(false);
-  const [downButton, setDownButton] = useState<boolean>(false);
-  const [arrButton, setArrButton] = useState<boolean>(false);
   const [elements, setElements] = useState<IElements>(defaultState);
   const [element, setElement] = useState<IElement>(defaultState);
-
   const [arrayNew, setArrayNew] = useState<number[]>([]);
   let [step, setStep] = useState<number>(0);
 
@@ -285,27 +275,34 @@ export const SortingPage: React.FC = () => {
 
   const handleButton = (e: React.SyntheticEvent): void => {
     e.preventDefault();
+    if (element.arr.length === 0) {
+      return
+    }
     const input = e.target as HTMLElement;
-    input.innerText === "По возрастанию"
-      ? setLoaderUp(true)
-      : setLoaderDown(true);
-    setArrButton(true);
-    if (getCheckedsetChoice && input.innerText === "По возрастанию") {
-      selectionSort(1);
-      setDownButton(true);
-    }
-    if (getCheckedsetChoice && input.innerText === "По убыванию") {
-      selectionSort(2);
-      setUpButton(true);
-    }
-    if (getCheckedVial && input.innerText === "По возрастанию") {
-      BubbleSort(1);
-      setDownButton(true);
-    }
-    if (getCheckedVial && input.innerText === "По убыванию") {
-      BubbleSort(2);
-      setUpButton(true);
-    }
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        upButton: {
+          disabled: input.innerText === "По убыванию",
+          loading: input.innerText === "По возрастанию",
+        },
+        downButton: {
+          disabled: input.innerText === "По возрастанию",
+          loading: input.innerText !== "По возрастанию",
+        },
+        arrButton: {
+          disabled: true,
+        },
+      };
+    });
+
+    getCheckedsetChoice
+      ? input.innerText === "По возрастанию"
+        ? selectionSort(1)
+        : selectionSort(2)
+      : input.innerText === "По возрастанию"
+      ? BubbleSort(1)
+      : BubbleSort(2);
   };
 
   const handleInput = (e: React.SyntheticEvent): void => {
@@ -329,11 +326,7 @@ export const SortingPage: React.FC = () => {
     });
     count++;
     if (count > steps - 1) {
-      setDownButton(false);
-      setUpButton(false);
-      setArrButton(false);
-      setLoaderUp(false);
-      setLoaderDown(false);
+      setButtonState(defaultButtonState);
       return;
     } else {
       setTimeout(count1, SHORT_DELAY_IN_MS, steps, count);
@@ -371,17 +364,17 @@ export const SortingPage: React.FC = () => {
               text="По возрастанию"
               sorting={Direction.Ascending}
               onClick={handleButton}
-              isLoader={loaderUp}
+              isLoader={buttonState.upButton.loading}
               linkedList="average"
-              disabled={upButton}
+              disabled={buttonState.upButton.disabled}
             />
             <Button
               text="По убыванию"
               sorting={Direction.Descending}
               onClick={handleButton}
-              isLoader={loaderDown}
+              isLoader={buttonState.downButton.loading}
               linkedList="average"
-              disabled={downButton}
+              disabled={buttonState.downButton.disabled}
             />
           </div>
           <div className={`${styles.button_rigth}`}>
@@ -389,7 +382,7 @@ export const SortingPage: React.FC = () => {
               text="Новый массив"
               linkedList="average"
               onClick={randomArr}
-              disabled={arrButton}
+              disabled={buttonState.arrButton.disabled}
             />
           </div>
         </div>

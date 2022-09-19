@@ -10,7 +10,7 @@ import { IStack } from "./stack-page.node";
 import { v4 as uuidv4 } from "uuid";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 
-let classStack: IStack<string> = new Stack<string>();
+const classStack: IStack<string> = new Stack<string>();
 
 interface INewStack {
   element: string | null;

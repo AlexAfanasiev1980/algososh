@@ -10,34 +10,24 @@ import { ILinkedList } from "./list-page.node";
 import { ElementStates } from "../../types/element-states";
 import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../constants/delays";
 import { IData } from "./types";
+import { IButtonState } from "./types";
+import { defaultButtonState, defaultdataState } from "./utils";
 
-let list: ILinkedList<number> = new LinkedList<number>();
+const list: ILinkedList<number> = new LinkedList<number>();
 
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputIndexValue, setInputIndexValue] = useState<string>("");
   const [listArr, setListArr] = useState<number[] | undefined>([]);
-  const [data, setData] = useState<IData>({
-    number: undefined,
-    index: undefined,
-    type: "",
-  });
+  const [data, setData] = useState<IData>(defaultdataState);
   const [numberColor, setNumberColor] = useState<number | undefined>();
   const [targetIndex, setTarget] = useState<number | undefined>();
-  const [addHead, setAddHead] = useState<boolean>(true);
-  const [addTail, setAddTail] = useState<boolean>(true);
-  const [addByIndex, setAddByIndex] = useState<boolean>(true);
-  const [deleteByIndex, setDelByIndex] = useState<boolean>(true);
-  const [delHead, setDelHead] = useState<boolean>(false);
-  const [delTail, setDelTail] = useState<boolean>(false);
-  const [loaderAddHead, setLoaderAddHead] = useState<boolean>(false);
-  const [loaderAddTail, setLoaderAddTail] = useState<boolean>(false);
-  const [loaderAddByIndex, setLoaderAddByIndex] = useState<boolean>(false);
-  const [loaderDelByIndex, setLoaderDelByIndex] = useState<boolean>(false);
-  const [loaderDelHead, setLoaderDelHead] = useState<boolean>(false);
-  const [loaderDelTail, setLoaderDelTail] = useState<boolean>(false);
+  const [buttonState, setButtonState] =
+    useState<IButtonState>(defaultButtonState);
 
   const randomListArray = () => {
+    setListArr([]);
+    list.clear();
     const random = Math.floor(Math.random() * (6 - 4) + 4);
     const arr = [];
     for (let i = 0; i < random; i++) {
@@ -61,6 +51,10 @@ export const ListPage: React.FC = () => {
     if (!inputIndexValue || !inputValue) {
       return;
     }
+    if (Number(inputIndexValue) > list.getSize()-1) {
+      alert(`Введите индекс от 1 до ${list.getSize()-1}`);
+      return;
+    }
     let count = 0;
     let element = Number(inputIndexValue);
     setData({
@@ -69,12 +63,35 @@ export const ListPage: React.FC = () => {
       index: count,
       type: "AddIndex",
     });
-    setLoaderAddByIndex(true);
-    setAddHead(true);
-    setAddTail(true);
-    setDelByIndex(true);
-    setDelHead(true);
-    setDelTail(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: true,
+          loading: false,
+        },
+        addInTail: {
+          disabled: true,
+          loading: false
+        },
+        delFromHead: {
+          disabled: true,
+          loading: false
+        },
+        delFromTail: {
+          disabled: true,
+          loading: false
+        },
+        addByIndex: {
+          disabled: false,
+          loading: true
+        },
+        delByIndex: {
+          disabled: true,
+          loading: false
+        },
+      };
+    });
     setTimeout(function get() {
       if (count < element) {
         count++;
@@ -93,7 +110,6 @@ export const ListPage: React.FC = () => {
           setInputIndexValue("");
           setData({ type: "" });
           setInputValue("");
-          setLoaderAddByIndex(false);
           setTimeout(() => {
             setNumberColor(undefined);
           }, SHORT_DELAY_IN_MS);
@@ -104,25 +120,51 @@ export const ListPage: React.FC = () => {
 
   const delByIndex = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    if (!inputIndexValue || Number(inputIndexValue) > list.getSize() - 1) {
+    if (!inputIndexValue) {
+      return;
+    }
+    if (Number(inputIndexValue) > list.getSize()-1) {
+      alert(`Введите индекс от 1 до ${list.getSize()-1}`);
       return;
     }
     let count = 0;
     let element = Number(inputIndexValue);
     let nodeValue: number | undefined | null = list?.getIndex(element)?.value;
-    // setTarget(element);
     setData({
       ...data,
       number: nodeValue,
       index: count,
       type: "DelIndex",
     });
-    setLoaderDelByIndex(true);
-    setAddHead(true);
-    setAddTail(true);
-    setAddByIndex(true);
-    setDelHead(true);
-    setDelTail(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: true,
+          loading: false,
+        },
+        addInTail: {
+          disabled: true,
+          loading: false
+        },
+        delFromHead: {
+          disabled: true,
+          loading: false
+        },
+        delFromTail: {
+          disabled: true,
+          loading: false
+        },
+        addByIndex: {
+          disabled: true,
+          loading: false
+        },
+        delByIndex: {
+          disabled: false,
+          loading: true
+        },
+      };
+    });
     setTimeout(function get() {
       if (count <= element) {
         count++;
@@ -152,7 +194,6 @@ export const ListPage: React.FC = () => {
           setTarget(undefined);
           setInputIndexValue("");
           setInputValue("");
-          setLoaderDelByIndex(false);
           setData({ type: "" });
           setInputValue("");
           setTimeout(() => {
@@ -171,19 +212,41 @@ export const ListPage: React.FC = () => {
       index: list.getSize() - 1,
       type: "head",
     });
-    setLoaderAddTail(true);
-    setAddHead(true);
-    setAddByIndex(true);
-    setDelByIndex(true);
-    setDelHead(true);
-    setDelTail(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: true,
+          loading: false,
+        },
+        addInTail: {
+          disabled: false,
+          loading: true
+        },
+        delFromHead: {
+          disabled: true,
+          loading: false
+        },
+        delFromTail: {
+          disabled: true,
+          loading: false
+        },
+        addByIndex: {
+          disabled: true,
+          loading: false
+        },
+        delByIndex: {
+          disabled: true,
+          loading: false
+        },
+      };
+    });
     setTimeout(() => {
       list.append(Number(inputValue));
       setNumberColor(list.getSize() - 1);
       setListArr(list.getElements());
       setData({ type: "" });
       setInputValue("");
-      setLoaderAddTail(false);
       setTimeout(() => {
         setNumberColor(undefined);
       }, SHORT_DELAY_IN_MS);
@@ -198,19 +261,41 @@ export const ListPage: React.FC = () => {
       index: 0,
       type: "head",
     });
-    setLoaderAddHead(true);
-    setAddTail(true);
-    setAddByIndex(true);
-    setDelByIndex(true);
-    setDelHead(true);
-    setDelTail(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: false,
+          loading: true,
+        },
+        addInTail: {
+          disabled: true,
+          loading: false
+        },
+        delFromHead: {
+          disabled: true,
+          loading: false
+        },
+        delFromTail: {
+          disabled: true,
+          loading: false
+        },
+        addByIndex: {
+          disabled: true,
+          loading: false
+        },
+        delByIndex: {
+          disabled: true,
+          loading: false
+        },
+      };
+    });
     setTimeout(() => {
       list.prepend(Number(inputValue));
       setNumberColor(0);
       setListArr(list.getElements());
       setData({ type: "" });
       setInputValue("");
-      setLoaderAddHead(false);
       setTimeout(() => {
         setNumberColor(undefined);
       }, DELAY_IN_MS);
@@ -225,17 +310,39 @@ export const ListPage: React.FC = () => {
       index: 0,
       type: "delTail",
     });
-    setLoaderDelHead(true);
-    setAddTail(true);
-    setAddHead(true);
-    setAddByIndex(true);
-    setDelByIndex(true);
-    setDelTail(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: true,
+          loading: false
+        },
+        addInTail: {
+          disabled: true,
+          loading: false
+        },
+        delFromHead: {
+          disabled: false,
+          loading: true
+        },
+        delFromTail: {
+          disabled: true,
+          loading: false
+        },
+        addByIndex: {
+          disabled: true,
+          loading: false
+        },
+        delByIndex: {
+          disabled: true,
+          loading: false
+        },
+      };
+    });
     setTimeout(() => {
       list.deleteHead();
       setListArr(list.getElements());
       setData({ type: "" });
-      setLoaderDelHead(false);
     }, SHORT_DELAY_IN_MS);
   };
 
@@ -247,27 +354,48 @@ export const ListPage: React.FC = () => {
       index: list.getSize() - 1,
       type: "delTail",
     });
-    setLoaderDelTail(true);
-    setAddTail(true);
-    setAddHead(true);
-    setAddByIndex(true);
-    setDelByIndex(true);
-    setDelHead(true);
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: true,
+          loading: false
+        },
+        addInTail: {
+          disabled: true,
+          loading: false
+        },
+        delFromHead: {
+          disabled: true,
+          loading: false
+        },
+        delFromTail: {
+          disabled: false,
+          loading: true
+        },
+        addByIndex: {
+          disabled: true,
+          loading: false
+        },
+        delByIndex: {
+          disabled: true,
+          loading: false
+        },
+      };
+    });
     setTimeout(() => {
       list.deleteTail();
       setListArr(list.getElements());
       setData({ type: "" });
-      setLoaderDelTail(false);
     }, SHORT_DELAY_IN_MS);
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    if (e.target.placeholder === "Введите значение") {
-      setInputValue(e.target.value.trim());
-    } else {
-      setInputIndexValue(e.target.value.trim());
+    if (!Number(e.target.value)) {
+      return;
     }
+    e.target.placeholder === "Введите значение" ? setInputValue(e.target.value.trim()) : setInputIndexValue(e.target.value.trim());
   };
 
   useEffect(() => {
@@ -275,24 +403,35 @@ export const ListPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (inputValue !== "") {
-      setAddHead(false);
-      setAddTail(false);
-    } else {
-      setAddHead(true);
-      setAddTail(true);
-    }
-
-    inputIndexValue !== "" && inputValue !== "" ? setAddByIndex(false) : setAddByIndex(true);
-    inputIndexValue !== "" && listArr ? setDelByIndex(false) : setDelByIndex(true);
-
-    if (listArr) {
-      setDelHead(false);
-      setDelTail(false);
-    } else {
-      setDelHead(true);
-      setDelTail(true);
-    }
+    setButtonState((prevState) => {
+      return {
+        ...prevState,
+        addInHead: {
+          disabled: inputValue === "",
+          loading: false,
+        },
+        addInTail: {
+          disabled: inputValue === "",
+          loading: false
+        },
+        delFromHead: {
+          disabled: listArr === undefined,
+          loading: false
+        },
+        delFromTail: {
+          disabled: listArr === undefined,
+          loading: false
+        },
+        addByIndex: {
+          disabled: (inputIndexValue === "" || inputValue === ""),
+          loading: false
+        },
+        delByIndex: {
+          disabled: (inputIndexValue === "" || listArr === undefined),
+          loading: false
+        },
+      };
+    });
   }, [listArr, inputValue, inputIndexValue]);
 
   return (
@@ -313,33 +452,33 @@ export const ListPage: React.FC = () => {
             <Button
               text="Добавить в head"
               extraClass="mr-6"
-              disabled={addHead}
+              disabled={buttonState.addInHead.disabled}
               linkedList="small"
               onClick={addArrPrepend}
-              isLoader={loaderAddHead}
+              isLoader={buttonState.addInHead.loading}
             />
             <Button
               text="Добавить в tail"
-              disabled={addTail}
+              disabled={buttonState.addInTail.disabled}
               extraClass="mr-6"
               linkedList="small"
               onClick={addArrAppend}
-              isLoader={loaderAddTail}
+              isLoader={buttonState.addInTail.loading}
             />
             <Button
               text="Удалить из head"
               extraClass="mr-6"
               linkedList="small"
               onClick={deleteArrPrepend}
-              disabled={delHead}
-              isLoader={loaderDelHead}
+              disabled={buttonState.delFromHead.disabled}
+              isLoader={buttonState.delFromHead.loading}
             />
             <Button
               text="Удалить из tail"
               linkedList="small"
               onClick={deleteArrAppend}
-              disabled={delTail}
-              isLoader={loaderDelTail}
+              disabled={buttonState.delFromTail.disabled}
+              isLoader={buttonState.delFromTail.loading}
             />
           </div>
         </div>
@@ -359,15 +498,15 @@ export const ListPage: React.FC = () => {
               extraClass="mr-6"
               linkedList="big"
               onClick={arrByIndex}
-              disabled={addByIndex}
-              isLoader={loaderAddByIndex}
+              disabled={buttonState.addByIndex.disabled}
+              isLoader={buttonState.addByIndex.loading}
             />
             <Button
               text="Удалить по индексу"
               linkedList="big"
               onClick={delByIndex}
-              disabled={deleteByIndex}
-              isLoader={loaderDelByIndex}
+              disabled={buttonState.delByIndex.disabled}
+              isLoader={buttonState.delByIndex.loading}
             />
           </div>
         </div>
@@ -422,7 +561,10 @@ export const ListPage: React.FC = () => {
             }
 
             return (
-              <li key={`${el.toString()}${index.toString()}`} className={styles.item_li}>
+              <li
+                key={`${el.toString()}${index.toString()}`}
+                className={styles.item_li}
+              >
                 <div>
                   {typeHead === 1 && (
                     <div className={styles.text_top}>
