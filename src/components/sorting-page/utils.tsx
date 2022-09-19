@@ -1,3 +1,5 @@
+import { IButtonState } from "./types";
+
 export const swap = (
   arr: number[],
   firstIndex: number,
@@ -8,3 +10,24 @@ export const swap = (
   arr[secondIndex] = temp;
   return arr;
 };
+
+export const defaultState = {
+  arr: [],
+  comparable: [],
+  notsorted: [],
+  sorted: [],
+}
+
+export const defaultButtonState: IButtonState = {
+  upButton: {
+    disabled: false,
+    loading: false
+  },
+  downButton: {
+    disabled: false,
+    loading: false
+  },
+  arrButton: {
+    disabled: false
+  }
+}

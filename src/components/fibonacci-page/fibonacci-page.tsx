@@ -4,9 +4,11 @@ import { Input } from "../ui/input/input";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import styles from "./fibonacci-page.module.css";
-import { v4 as uuidv4 } from "uuid";
 import { SHORT_DELAY_IN_MS, DELAY_IN_MS } from "../../constants/delays";
 import { getArr, getFibonacciNumbers  } from "./utils";
+
+const MAX_STRING = 9;
+const MAX_LENGTH = 19;
 
 export const FibonacciPage: React.FC = () => {
   const [fibonacci, setFibonacci] = useState<Array<number> | null>([]);
@@ -14,9 +16,7 @@ export const FibonacciPage: React.FC = () => {
   const [loader, setLoader] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
   const [isDisabled, setDisabled] = useState<boolean>(false);
-  const maxString = 9;
-  const maxLength = 19;
-
+  
   const countID = (arr: number[], steps: number, count: number) => {
     setLoader(true);
     setFibonacci(getArr(arr, count));
@@ -37,7 +37,8 @@ export const FibonacciPage: React.FC = () => {
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    Number(e.target.value) > maxLength ? setDisabled(true) : setDisabled(false);
+    const isNotCorrectValue = Number(e.target.value) > MAX_LENGTH
+    setDisabled(isNotCorrectValue);
     setInputValue(e.target.value);
   };
 
@@ -70,9 +71,9 @@ export const FibonacciPage: React.FC = () => {
       {fibonacci && (
         <div className={styles.string}>
           {fibonacci.map((el, index, arr) => {
-            const classText =  index === arr.length - 1 || index === maxString ? "item1" : "item"
+            const classText =  index === arr.length - 1 || index === MAX_STRING ? "item1" : "item"
             return (
-              <div className={styles[classText]} key={uuidv4()}>
+              <div className={styles[classText]} key={`${el}${index}`}>
                 <Circle letter={String(el)} key={index} />
                 <p className={styles.text}>{index}</p>
               </div>
