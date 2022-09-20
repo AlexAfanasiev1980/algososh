@@ -36,6 +36,10 @@
   width: 175px;
 }
 
+.average {
+  width: 205px;
+}
+
 .loader:disabled {
   background-color: var(--bg-button-default);
 }

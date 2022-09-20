@@ -37,3 +37,8 @@
 .input::placeholder {
   color: var(--text-input-placeholder);
 }
+
+.content1 {
+  
+  width: 200px;
+}

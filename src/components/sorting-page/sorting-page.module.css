@@ -1,0 +1,36 @@
+.flex {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.itemList {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.radioInput {
+  width: 221px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 52px 0 0;
+}
+
+.button {
+  width: 422px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.button_rigth {
+  margin: 0 0 0 80px;
+}
+
+.column {
+  height: 347px;
+  align-items: flex-end;
+  justify-content: center;
+  max-width: 980px;
+  margin: 48px auto 0 auto;
+}
