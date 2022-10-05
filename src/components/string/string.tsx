@@ -6,19 +6,37 @@ import { Circle } from "../ui/circle/circle";
 import styles from "./string.module.css";
 import { ElementStates } from "../../types/element-states";
 
+const swap = (arr: string[], start: number, end: number): string[] => {
+  const temp = arr[start];
+  arr[start] = arr[end];
+  arr[end] = temp;
+  return arr;
+};
+
+export const revers = (arr: string[]): string[][] => {
+  if (arr.length === 0) {
+    return []
+  }
+  let start = 0;
+  let end = arr.length - 1;
+  let arrString: string[][] = [];
+  arrString.push([...arr]);
+  while (start < end) {
+    arrString.push([...swap(arr, start, end)]);
+    start++;
+    end--;
+  }
+  return arrString;
+}
+
+
+
 export const StringComponent: React.FC = () => {
   const [stringLetter, setStringLetter] = useState<Array<string>>([]);
   const [string, setString] = useState<Array<Array<string>>>([]);
   const [step, setStep] = useState<number>();
   const [loader, setLoader] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState("");
-
-  const swap = (arr: string[], start: number, end: number): string[] => {
-    const temp = arr[start];
-    arr[start] = arr[end];
-    arr[end] = temp;
-    return arr;
-  };
 
   const countID = (steps: number, count: number) => {
     setLoader(true);
@@ -35,19 +53,8 @@ export const StringComponent: React.FC = () => {
 
   const handleButton = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    const arr: string[] = inputValue.split('');
-    let start = 0;
-    let end = arr.length - 1;
-    let arrString: string[][] = [];
-    arrString.push([...arr]);
-    while (start < end) {
-      arrString.push([...swap(arr, start, end)]);
-      start++;
-      end--;
-    }
-    setString(arrString);
-    setInputValue("");
-    
+    setString(revers(inputValue.split('')));
+    setInputValue('');
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +76,9 @@ export const StringComponent: React.FC = () => {
           extraClass="mr-6"
           value={inputValue}
           onChange={onChange}
+          data-testid="input"
         />
-        <Button text="Развернуть" onClick={handleButton} isLoader={loader} />
+        <Button text="Развернуть" onClick={handleButton} isLoader={loader} data-testid="button"/>
       </div>
 
       {stringLetter && (
@@ -89,9 +97,9 @@ export const StringComponent: React.FC = () => {
                   color = ElementStates.Default;
                 }
               }
-              return <Circle state={color} letter={el} key={index}/>;
+              return <Circle state={color} letter={el} key={index} data-testid='circle'/>;
             } else {
-              return <Circle letter={el} key={index}/>;
+              return <Circle letter={el} key={index} data-testid='circle'/>;
             }
           })}
         </div>
