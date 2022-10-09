@@ -37,8 +37,8 @@ export const FibonacciPage: React.FC = () => {
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isNotCorrectValue = Number(e.target.value) > MAX_LENGTH
-    setDisabled(isNotCorrectValue);
+    // const isNotCorrectValue = Number(e.target.value) > MAX_LENGTH
+    // setDisabled(isNotCorrectValue);
     setInputValue(e.target.value);
   };
 
@@ -47,6 +47,10 @@ export const FibonacciPage: React.FC = () => {
       setTimeout(countID, SHORT_DELAY_IN_MS, arrFib, arrFib.length, 1);
     }
   }, [arrFib]);
+
+  useEffect(() => {
+    setDisabled(inputValue.length === 0 ? true : Number(inputValue) > MAX_LENGTH ? true : false)
+  }, [inputValue]);
 
   return (
     <SolutionLayout title="Последовательность Фибоначчи">

@@ -15,7 +15,7 @@ const swap = (arr: string[], start: number, end: number): string[] => {
 
 export const revers = (arr: string[]): string[][] => {
   if (arr.length === 0) {
-    return []
+    return [];
   }
   let start = 0;
   let end = arr.length - 1;
@@ -27,16 +27,15 @@ export const revers = (arr: string[]): string[][] => {
     end--;
   }
   return arrString;
-}
-
-
+};
 
 export const StringComponent: React.FC = () => {
   const [stringLetter, setStringLetter] = useState<Array<string>>([]);
   const [string, setString] = useState<Array<Array<string>>>([]);
   const [step, setStep] = useState<number>();
   const [loader, setLoader] = useState<boolean>(false);
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState<string>("");
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   const countID = (steps: number, count: number) => {
     setLoader(true);
@@ -53,8 +52,8 @@ export const StringComponent: React.FC = () => {
 
   const handleButton = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setString(revers(inputValue.split('')));
-    setInputValue('');
+    setString(revers(inputValue.split("")));
+    setInputValue("");
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +66,10 @@ export const StringComponent: React.FC = () => {
     }
   }, [string]);
 
+  useEffect(() => {
+    setDisabled(inputValue.length === 0 ? true : false);
+  }, [inputValue]);
+
   return (
     <SolutionLayout title="Строка">
       <div className={`${styles.content}`}>
@@ -78,7 +81,13 @@ export const StringComponent: React.FC = () => {
           onChange={onChange}
           data-testid="input"
         />
-        <Button text="Развернуть" onClick={handleButton} isLoader={loader} data-testid="button"/>
+        <Button
+          text="Развернуть"
+          onClick={handleButton}
+          isLoader={loader}
+          disabled={disabled}
+          data-testid="button"
+        />
       </div>
 
       {stringLetter && (
@@ -97,9 +106,15 @@ export const StringComponent: React.FC = () => {
                   color = ElementStates.Default;
                 }
               }
-              return <Circle state={color} letter={el} key={index} data-testid='circle'/>;
+              return (
+                <Circle
+                  state={color}
+                  letter={el}
+                  key={index}
+                />
+              );
             } else {
-              return <Circle letter={el} key={index} data-testid='circle'/>;
+              return <Circle letter={el} key={index} />;
             }
           })}
         </div>

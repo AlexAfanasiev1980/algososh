@@ -146,13 +146,13 @@ export const QueuePage: React.FC = () => {
                 ? "item_stack1"
                 : "item_stack";
             return (
-              <li className={styles[classText]} key={`${el}${index.toString()}`}>
+              <li className={styles[classText]} key={`${el}${index.toString()}`} data-testid="item">
                 {index === head && <p className={styles.text_top}>head</p>}
                 {index !== head && <p className={styles.text_top}> </p>}
                 <Circle letter={el} state={color} />
                 <p className={styles.text}>{index}</p>
                 {tail !== 0 && index === tail - 1 && (
-                  <p className={styles.text}>tail</p>
+                  <p className={styles.text} >tail</p>
                 )}
               </li>
             );
