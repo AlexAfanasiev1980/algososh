@@ -69,7 +69,7 @@ exports[`should render and Match Snapshot 1`] = `
             <input
               checked={true}
               className="input"
-              id="tiYXXwzyh-96feKNJE-Hs"
+              id="igRc8KcYzlTVG0h9P-K-I"
               name="choice"
               onChange={[Function]}
               type="radio"
@@ -77,7 +77,7 @@ exports[`should render and Match Snapshot 1`] = `
             />
             <label
               className="text text_type_button label"
-              htmlFor="tiYXXwzyh-96feKNJE-Hs"
+              htmlFor="igRc8KcYzlTVG0h9P-K-I"
             >
               Выбор
             </label>
@@ -88,7 +88,7 @@ exports[`should render and Match Snapshot 1`] = `
             <input
               checked={false}
               className="input"
-              id="4t1h6sDGd0mvDCt8dggSB"
+              id="GP1Qynj_X52rH7uSWQU2T"
               name="vial"
               onChange={[Function]}
               type="radio"
@@ -96,7 +96,7 @@ exports[`should render and Match Snapshot 1`] = `
             />
             <label
               className="text text_type_button label"
-              htmlFor="4t1h6sDGd0mvDCt8dggSB"
+              htmlFor="GP1Qynj_X52rH7uSWQU2T"
             >
               Пузырек
             </label>
