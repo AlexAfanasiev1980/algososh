@@ -15,6 +15,15 @@ import { defaultButtonState, defaultdataState } from "./utils";
 
 const list: ILinkedList<number> = new LinkedList<number>();
 
+const getRandomArr = (): number[] => {
+  const random: number = Math.floor(Math.random() * (6 - 4) + 4);
+  const arr: number[] = [];
+  for (let i = 0; i < random; i++) {
+    arr.push(Math.floor(Math.random() * 100));
+  }
+  return arr;
+}
+
 export const ListPage: React.FC = () => {
   const [inputValue, setInputValue] = useState<string>("");
   const [inputIndexValue, setInputIndexValue] = useState<string>("");
@@ -28,12 +37,9 @@ export const ListPage: React.FC = () => {
   const randomListArray = () => {
     setListArr([]);
     list.clear();
-    const random = Math.floor(Math.random() * (6 - 4) + 4);
-    const arr = [];
-    for (let i = 0; i < random; i++) {
-      let value = Math.floor(Math.random() * 100);
-      arr.push(value);
-      list.append(value);
+    const arr: number[] = getRandomArr();
+    for (let i = 0; i < arr.length; i++) {
+      list.append(arr[i]);
     }
     const setList: number[] | undefined = [];
     let current = list.getHead();
@@ -564,10 +570,11 @@ export const ListPage: React.FC = () => {
               <li
                 key={`${el.toString()}${index.toString()}`}
                 className={styles.item_li}
+                data-testid="item"
               >
                 <div>
                   {typeHead === 1 && (
-                    <div className={styles.text_top}>
+                    <div className={styles.text_top} data-testid="cyrcle_head">
                       <Circle
                         letter={data?.number?.toString()}
                         state={ElementStates.Changing}
@@ -575,13 +582,13 @@ export const ListPage: React.FC = () => {
                       />
                     </div>
                   )}
-                  {typeHead === 2 && <p className={styles.text_top}>head</p>}
+                  {typeHead === 2 && <p className={styles.text_top} data-testid="cyrcle_head">head</p>}
                   {typeHead === 3 && <p className={styles.text_top}></p>}
                   <Circle letter={element} state={color} />
                   <p className={styles.text}>{index}</p>
                   {typeTail === 1 &&
                     (data.type === "delTail" || data.type === "DelIndex") && (
-                      <div className={styles.text_button}>
+                      <div className={styles.text_button} data-testid="cyrcle_tail">
                         <Circle
                           letter={data?.number?.toString()}
                           state={ElementStates.Changing}
@@ -589,7 +596,7 @@ export const ListPage: React.FC = () => {
                         />
                       </div>
                     )}
-                  {typeTail === 2 && <p className={styles.text_button}>tail</p>}
+                  {typeTail === 2 && <p className={styles.text_button} data-testid="cyrcle_tail">tail</p>}
                   {typeTail === 3 && <p className={styles.text_button}> </p>}
                 </div>
                 {index !== arr.length - 1 && (

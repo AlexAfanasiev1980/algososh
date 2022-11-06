@@ -10,152 +10,92 @@ import { IElements, IElement, IButtonState } from "./types";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { swap, defaultState, defaultButtonState } from "./utils";
 
-export const SortingPage: React.FC = () => {
-  const [buttonState, setButtonState] =
-    useState<IButtonState>(defaultButtonState);
-  const [getCheckedsetChoice, setCheckedChoice] = useState<boolean>(true);
-  const [getCheckedVial, setCheckedVial] = useState<boolean>(false);
-  const [array, setArray] = useState<number[]>([]);
-  const [elements, setElements] = useState<IElements>(defaultState);
-  const [element, setElement] = useState<IElement>(defaultState);
-  const [arrayNew, setArrayNew] = useState<number[]>([]);
-  let [step, setStep] = useState<number>(0);
-
-  const randomArr = (e: React.SyntheticEvent): void => {
-    e.preventDefault();
-    const random = Math.floor(Math.random() * (18 - 3) + 3);
-    const arr = [];
-    for (let i = 0; i < random; i++) {
-      arr.push(Math.floor(Math.random() * 100));
-    }
-    const notsorted = [];
-    for (let i = 0; i < arr.length; i++) {
-      notsorted.push(i);
-    }
-    setArray([...arr]);
-    setArrayNew([...arr]);
-    setElements({
-      ...elements,
-      arr: [arr],
-      notsorted: [notsorted],
-      comparable: [[]],
-      sorted: [[]],
-    });
-    setStep(0);
-  };
-
-  const selectionSort = (choice: number) => {
-    const { length } = array;
-    const notsorted = [];
-    for (let i = 0; i < array.length; i++) {
-      notsorted.push(i);
-    }
-    setElements({
-      ...elements,
-      arr: [array],
-      notsorted: [notsorted],
-      comparable: [[]],
-      sorted: [[]],
-    });
-    const arrayElemets: Array<number[]> = [arrayNew];
-    let elementsData: IElements = elements;
-    let sortedData: number[] = [];
-    let comparableData: number[] = [];
-    let notsortedData: number[] = [];
-    for (let i = 0; i < length - 1; i++) {
-      let maxInd = i;
-      let index = i;
-      let minInd: number | undefined = 0;
-      for (let j = maxInd + 1; j <= length - 1; j++) {
-        for (let u = 0; u < length; u++) {
-          const filter: number[] = elementsData.sorted[step].filter(
-            (el) => u === el
-          );
-          if (u !== i && u !== j && filter.length === 0) {
-            notsortedData.push(u);
-          }
-        }
-        elementsData = {
-          ...elementsData,
-          arr: [
-            ...elementsData.arr,
-            elementsData.arr[elementsData.arr.length - 1],
-          ],
-          comparable: [...elementsData.comparable, [i, j]],
-          notsorted: [...elementsData.notsorted, [...notsortedData]],
-          sorted: [...elementsData.sorted, [...elementsData.sorted[step]]],
-        };
-        notsortedData = [];
-        setStep(step++);
-        if (choice === 1) {
-          if (array[j] < array[index]) {
-            minInd = j;
-            index = j;
-          }
-        } else {
-          if (array[j] > array[index]) {
-            minInd = j;
-            index = j;
-          }
-        }
-      }
-      let arrAdd: number[];
-      sortedData.push(i);
-      if (minInd !== 0) {
-        arrAdd = swap(array, maxInd, minInd);
-      } else {
-        arrAdd = elementsData.arr[step];
-      }
-      arrayElemets.push([...arrAdd]);
-      if (length - 2 <= i) {
-        sortedData.push(i + 1);
-      } else {
-        comparableData = [i + 1, i + 2];
-      }
+export const handleSelectionSort = (choice: number, arrayNew: number[], array: number[], elements: IElements) => {
+  const { length } = array;
+  const arrayElemets: Array<number[]> = [arrayNew];
+  let elementsData: IElements = elements;
+  let sortedData: number[] = [];
+  let comparableData: number[] = [];
+  let notsortedData: number[] = [];
+  let step: number = 0;
+  for (let i = 0; i < length - 1; i++) {
+    let maxInd = i;
+    let index = i;
+    let minInd: number | undefined = 0;
+    for (let j = maxInd + 1; j <= length - 1; j++) {
       for (let u = 0; u < length; u++) {
-        const filterSort = sortedData.includes(u);
-        const filterComparable = comparableData.includes(u);
-        if (u !== i && !filterSort && !filterComparable) {
+        const filter: number[] = elementsData.sorted[step].filter(
+          (el) => u === el
+        );
+        if (u !== i && u !== j && filter.length === 0) {
           notsortedData.push(u);
         }
       }
       elementsData = {
         ...elementsData,
-        arr: [...elementsData.arr, [...arrAdd]],
-        comparable: [...elementsData.comparable, [...comparableData]],
+        arr: [
+          ...elementsData.arr,
+          elementsData.arr[elementsData.arr.length - 1],
+        ],
+        comparable: [...elementsData.comparable, [i, j]],
         notsorted: [...elementsData.notsorted, [...notsortedData]],
-        sorted: [...elementsData.sorted, [...sortedData]],
+        sorted: [...elementsData.sorted, [...elementsData.sorted[step]]],
       };
-      setStep(step++);
       notsortedData = [];
+      step++;
+      if (choice === 1) {
+        if (array[j] < array[index]) {
+          minInd = j;
+          index = j;
+        }
+      } else {
+        if (array[j] > array[index]) {
+          minInd = j;
+          index = j;
+        }
+      }
     }
-    setElements(elementsData);
-  };
+    let arrAdd: number[];
+    sortedData.push(i);
+    if (minInd !== 0) {
+      arrAdd = swap(array, maxInd, minInd);
+    } else {
+      arrAdd = elementsData.arr[step];
+    }
+    arrayElemets.push([...arrAdd]);
+    if (length - 2 <= i) {
+      sortedData.push(i + 1);
+    } else {
+      comparableData = [i + 1, i + 2];
+    }
+    for (let u = 0; u < length; u++) {
+      const filterSort = sortedData.includes(u);
+      const filterComparable = comparableData.includes(u);
+      if (u !== i && !filterSort && !filterComparable) {
+        notsortedData.push(u);
+      }
+    }
+    elementsData = {
+      ...elementsData,
+      arr: [...elementsData.arr, [...arrAdd]],
+      comparable: [...elementsData.comparable, [...comparableData]],
+      notsorted: [...elementsData.notsorted, [...notsortedData]],
+      sorted: [...elementsData.sorted, [...sortedData]],
+    };
+    step++;
+    notsortedData = [];
+  }
 
-  const BubbleSort = (choice: number) => {
-    setElements({
-      ...elements,
-      arr: [],
-      notsorted: [],
-      comparable: [],
-      sorted: [],
-    });
-    const { length } = array;
-    const notsorted = [];
-    for (let i = 0; i < array.length; i++) {
-      notsorted.push(i);
-    }
-    setElements({
-      ...elements,
-      arr: [array],
-      notsorted: [[...notsorted]],
-      comparable: [[]],
-      sorted: [[]],
-    });
-    let arrayElemets: number[] = arrayNew;
+  return elementsData;
+}
+
+export const handleBubbleSort = (choice: number, arrayNew: number[], array: number[], elements: IElements) => {
+  const { length } = array;
+  let arrayElemets: number[] = arrayNew;
     let elementsData: IElements = elements;
     let sortedData: number[] = [];
     let notsortedData: number[] = [];
+    let step: number = 0;
 
     for (let i = 0; i < length - 1; i++) {
       for (let j = 0; j < length - 1 - i; j++) {
@@ -175,7 +115,7 @@ export const SortingPage: React.FC = () => {
           sorted: [...elementsData.sorted, [...sortedData]],
         };
         notsortedData = [];
-        setStep(step++);
+        step++;
         if (choice === 1) {
           if (arrayElemets[j + 1] < arrayElemets[j]) {
             arrayElemets = [...swap(arrayElemets, j, j + 1)];
@@ -192,7 +132,7 @@ export const SortingPage: React.FC = () => {
               ],
               sorted: [...elementsData.sorted, [...elementsData.sorted[step]]],
             };
-            setStep(step++);
+            step++;
           }
           if (j === length - 2 - i) {
             sortedData.push(j + 1);
@@ -209,7 +149,7 @@ export const SortingPage: React.FC = () => {
               sorted: [...elementsData.sorted, [...sortedData]],
             };
             notsortedData = [];
-            setStep(step++);
+            step++;
           }
           if (i === length - 2) {
             sortedData.push(0);
@@ -237,7 +177,7 @@ export const SortingPage: React.FC = () => {
               ],
               sorted: [...elementsData.sorted, [...elementsData.sorted[step]]],
             };
-            setStep(step++);
+            step++;
           }
           if (j === length - 2 - i) {
             sortedData.push(j + 1);
@@ -254,7 +194,7 @@ export const SortingPage: React.FC = () => {
               sorted: [...elementsData.sorted, [...sortedData]],
             };
             notsortedData = [];
-            setStep(step++);
+            step++;
           }
           if (i === length - 2) {
             sortedData.push(0);
@@ -269,8 +209,77 @@ export const SortingPage: React.FC = () => {
         }
       }
     }
-    setStep(0);
-    setElements(elementsData);
+    return elementsData;
+}
+
+
+export const SortingPage: React.FC = () => {
+  const [buttonState, setButtonState] =
+    useState<IButtonState>(defaultButtonState);
+  const [getCheckedsetChoice, setCheckedChoice] = useState<boolean>(true);
+  const [getCheckedVial, setCheckedVial] = useState<boolean>(false);
+  const [array, setArray] = useState<number[]>([]);
+  const [elements, setElements] = useState<IElements>(defaultState);
+  const [element, setElement] = useState<IElement>(defaultState);
+  const [arrayNew, setArrayNew] = useState<number[]>([]);
+
+  const randomArr = (e: React.SyntheticEvent): void => {
+    e.preventDefault();
+    const random = Math.floor(Math.random() * (18 - 3) + 3);
+    const arr = [];
+    for (let i = 0; i < random; i++) {
+      arr.push(Math.floor(Math.random() * 100));
+    }
+    const notsorted = [];
+    for (let i = 0; i < arr.length; i++) {
+      notsorted.push(i);
+    }
+    setArray([...arr]);
+    setArrayNew([...arr]);
+    setElements({
+      ...elements,
+      arr: [arr],
+      notsorted: [notsorted],
+      comparable: [[]],
+      sorted: [[]],
+    });
+  };
+
+  const selectionSort = (choice: number) => {
+    const notsorted = [];
+    for (let i = 0; i < array.length; i++) {
+      notsorted.push(i);
+    }
+    setElements({
+      ...elements,
+      arr: [array],
+      notsorted: [notsorted],
+      comparable: [[]],
+      sorted: [[]],
+    });
+    setElements(handleSelectionSort(choice, arrayNew, array, elements))
+  };
+
+  const BubbleSort = (choice: number) => {
+    setElements({
+      ...elements,
+      arr: [],
+      notsorted: [],
+      comparable: [],
+      sorted: [],
+    });
+    const notsorted = [];
+    for (let i = 0; i < array.length; i++) {
+      notsorted.push(i);
+    }
+    setElements({
+      ...elements,
+      arr: [array],
+      notsorted: [[...notsorted]],
+      comparable: [[]],
+      sorted: [[]],
+    });
+    setElements(handleBubbleSort(choice, arrayNew, array, elements));
   };
 
   const handleButton = (e: React.SyntheticEvent): void => {
